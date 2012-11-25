@@ -21,8 +21,15 @@ default['multi_repo']['repo_path'] = "/srv/repo"
 default['multi_repo']['repo_mount'] = ""
 default['multi_repo']['sysadmin_email'] = ""
 default['multi_repo']['chef_repo_path'] = ""
+
+#folder where you can drop rpm and gem files to automatically be added to the repo
 default['multi_repo']['repo_dropbox_path'] = "/root/repo_dropbox"
+
+# extra repository directories to create
 default['multi_repo']['extra_repo_subdirs'] = [ "tools","product","windows","linux"]
+
+# used by the slave repo recipe to find the master repo by role
+default['multi_repo']['master_repo_role'] = "multi_repo_master"
 
 default['multi_repo']['mirrors']['mirror_centos'] = true
 default['multi_repo']['mirrors']['centos_releases'] = ["6.3"]
