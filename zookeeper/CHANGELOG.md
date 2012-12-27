@@ -1,3 +1,8 @@
+## 1.2.0
+* zookeeper 3.4.5
+
+## 1.1.7
+* Added ulimit to runit script
 ## 1.1.6
 * added more log messages to search method
 * decreased search timeout to 60 seconds
