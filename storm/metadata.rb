@@ -1,3 +1,4 @@
+name             "storm"
 maintainer       "Webtrends, Inc."
 maintainer_email "sean.mcnamara@webtrends.com"
 license          "All rights reserved"
