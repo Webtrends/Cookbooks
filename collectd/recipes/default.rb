@@ -18,10 +18,10 @@
 #
 
 package "collectd" do
-  case node[:platform]
-  when "centos","redhat","fedora","suse","scientific","amazon"
+  case node[:platform_family]
+  when "rhel"
     package_name "collectd"
-  when "debian","ubuntu"
+  when "debian"
     package_name "collectd-core"
     options "--force-yes"
   end
