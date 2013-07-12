@@ -7,9 +7,6 @@ Requirements
 ============
 * Java cookbook version >= 1.5
 * Runit cookbook
-* Zookeeper cookbook - The Kafka cookbook will utilize the clientPort from the Zookeeper cookbook
-  as well as look for a role called "zookeeper" that is applied to nodes. All nodes with the role applied
-  to them will be used as the Zookeeper quorum that Kafka connects to.
 
 Attributes
 ==========
