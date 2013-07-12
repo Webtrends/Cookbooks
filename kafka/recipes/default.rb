@@ -135,15 +135,8 @@ end
 zookeeper_pairs = Array.new
 if not Chef::Config.solo
   search(:node, "role:zookeeper AND chef_environment:#{node.chef_environment}").each do |n|
-    zookeeper_pairs << n[:fqdn]
+    zookeeper_pairs << "#{n[:fqdn]}:#{n[:zookeeper][:client_port]}"
   end
-end
-
-# append the zookeeper client port (defaults to 2181)
-i = 0
-while i < zookeeper_pairs.size do
-  zookeeper_pairs[i] = zookeeper_pairs[i].concat(":#{node[:zookeeper][:client_port]}")
-  i += 1
 end
 
 %w[server.properties log4j.properties].each do |template_file|
@@ -154,8 +147,7 @@ end
     mode  00755
     variables({
       :kafka => node[:kafka],
-      :zookeeper_pairs => zookeeper_pairs,
-      :client_port => node[:zookeeper][:client_port]
+      :zookeeper_pairs => zookeeper_pairs
     })
   end
 end

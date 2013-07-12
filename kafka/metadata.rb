@@ -7,7 +7,6 @@ version           "1.0.20"
 
 depends           "java"
 depends           "runit"
-depends           "zookeeper"
 
 recipe	"kafka::default",		"Base configuration for kafka"
 
