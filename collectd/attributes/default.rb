@@ -28,10 +28,10 @@ default[:collectd][:collectd_web][:path] = "/srv/collectd_web"
 default[:collectd][:collectd_web][:hostname] = "collectd"
 
 #Set the Collectd plugin location based on the linux distro
-case node[:platform]
-when "ubuntu","debian"
+case node[:platform_family]
+when "debian"
   default[:collectd][:plugin_dir] = "/usr/lib/collectd"
-when "redhat","centos","fedora","scientific","amazon"
+when "rhel","fedora"
   default[:collectd][:plugin_dir] = "/usr/lib64/collectd"
 else
   default[:collectd][:plugin_dir] = "/usr/lib/collectd"

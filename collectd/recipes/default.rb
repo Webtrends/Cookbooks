@@ -18,10 +18,10 @@
 #
 
 package "collectd" do
-  case node[:platform]
-  when "centos","redhat","fedora","suse","scientific","amazon"
+  case node[:platform_family]
+  when "rhel","fedora"
     package_name "collectd"
-  when "debian","ubuntu"
+  when "debian"
     package_name "collectd-core"
     options "--force-yes"
   end
@@ -30,7 +30,7 @@ end
 
 #WT custom modification to the base recipe:
 #If this is a RH based distro then install the collectd-java plugin since it's installed by default in ubuntu.
-if platform?("centos","redhat","fedora","suse")
+if platform_family?("rhel","fedora")
   # WT's collectd-java RPM requires that libjvm.so is accessable. So we need to setup a symlink if this file exists.
   # Create a symbolic link to libjvm.so so the collectd java/jmx plugin works properly.
   link "/usr/lib64/libjvm.so" do
@@ -39,7 +39,7 @@ if platform?("centos","redhat","fedora","suse")
   end
   package "collectd-java" do
     package_name "collectd-java"
-    action [:install]
+    action :install
   end
 else
   # do nothing
@@ -47,7 +47,7 @@ end
 
 #WT custom modification to the base recipe:
 # WT's collectd custom DEB requires that libjvm.so is accessable. So we need to setup a symlink if this file exists.
-if platform?("debian","ubuntu")
+if platform_family?("debian")
   # Create a symbolic link to libjvm.so so the collectd java/jmx plugin works properly.
   link "/usr/lib/libjvm.so" do
     to "/usr/lib/jvm/default-java/jre/lib/amd64/server/libjvm.so"
@@ -63,12 +63,12 @@ end
 
 ruby_block "edit init script" do
   block do
-    case node[:platform]
-    when "centos","redhat","fedora","suse"
+    case node[:platform_family]
+    when "rhel","fedora"
       rc = Chef::Util::FileEdit.new("/etc/rc.d/init.d/collectd")
       rc.search_file_replace_line("CONFIG=", "CONFIG=#{node[:collectd][:conf_dir]}/collectd.conf")
       rc.write_file
-    when "debian","ubuntu"
+    when "debian"
       rc = Chef::Util::FileEdit.new("/etc/init.d/collectd")
       rc.search_file_replace_line("CONFIGFILE=", "CONFIGFILE=#{node[:collectd][:conf_dir]}/collectd.conf")
       rc.write_file
