@@ -17,11 +17,15 @@
 # limitations under the License.
 
 include_recipe "java"
+include_recipe "runit"
 
-if ENV["deploy_build"] == "true" then
-  log "The deploy_build value is true so un-deploy first"
-  include_recipe "storm::undeploy-default"
-end
+
+install_dir = "#{node['storm']['root_dir']}/storm-#{node['storm']['version']}"
+
+node.set['storm']['lib_dir'] = "#{install_dir}/lib"
+node.set['storm']['conf_dir'] = "#{install_dir}/conf"
+node.set['storm']['bin_dir'] = "#{install_dir}/bin"
+node.set['storm']['install_dir'] = install_dir
 
 # install dependency packages
 %w{unzip python zeromq jzmq}.each do |pkg|
@@ -30,16 +34,18 @@ end
   end
 end
 
-# search
-storm_nimbus = search(:node, "role:storm_nimbus AND role:#{node['storm']['cluster_role']} AND chef_environment:#{node.chef_environment}").first
+#locate the nimbus for this storm cluster
+if node.recipes.include?("storm::nimbus")
+  nimbus_host = node
+else
+  nimbus_host = search(:node, "role:storm_nimbus AND role:#{node['storm']['cluster_role']} AND chef_environment:#{node.chef_environment}").first
+end
 
 # search for zookeeper servers
 zookeeper_quorum = Array.new
 search(:node, "role:zookeeper AND chef_environment:#{node.chef_environment}").each do |n|
 	zookeeper_quorum << n[:fqdn]
 end
-
-install_dir = "#{node['storm']['install_dir']}/storm-#{node['storm']['version']}"
 
 # setup storm group
 group "storm"
@@ -53,8 +59,13 @@ user "storm" do
   supports :manage_home => true
 end
 
+# storm looks for storm.yaml in ~/.storm/storm.yaml so make a link
+link "/home/storm/.storm" do
+  to node['storm']['conf_dir']
+end 
+
 # setup directories
-%w{install_dir local_dir log_dir}.each do |name|
+%w{conf_dir local_dir log_dir install_dir bin_dir}.each do |name|
   directory node['storm'][name] do
     owner "storm"
     group "storm"
@@ -69,29 +80,29 @@ remote_file "#{Chef::Config[:file_cache_path]}/storm-#{node[:storm][:version]}.t
   owner  "storm"
   group  "storm"
   mode   00744
-  not_if "test -f #{Chef::Config[:file_cache_path]}/storm-#{node['storm']['version']}.tar.gz"
+  action :create_if_missing
 end
 
 # uncompress the application tarball into the install directory
 execute "tar" do
   user    "storm"
   group   "storm"
-  creates "#{node['storm']['install_dir']}/storm-#{node['storm']['version']}"
-  cwd     "#{node['storm']['install_dir']}"
+  creates node['storm']['lib_dir']
+  cwd     node['storm']['root_dir']
   command "tar zxvf #{Chef::Config[:file_cache_path]}/storm-#{node['storm']['version']}.tar.gz"
 end
 
 # create a link from the specific version to a generic current folder
-link "#{node['storm']['install_dir']}/current" do
-	to "#{node['storm']['install_dir']}/storm-#{node['storm']['version']}"
+link "#{node['storm']['root_dir']}/current" do
+	to node['storm']['install_dir']
 end
 
 # storm.yaml
-template "#{node['storm']['install_dir']}/storm-#{node['storm']['version']}/conf/storm.yaml" do
+template "#{node['storm']['conf_dir']}/storm.yaml" do
   source "storm.yaml.erb"
   mode 00644
   variables(
-    :nimbus => storm_nimbus,
+    :nimbus => nimbus_host,
     :zookeeper_quorum => zookeeper_quorum
   )
 end
@@ -103,11 +114,11 @@ template "/home/storm/.profile" do
   source "profile.erb"
   mode   00644
   variables(
-    :storm_dir => "#{node['storm']['install_dir']}/storm-#{node['storm']['version']}"
+    :storm_dir => node['storm']['install_dir']
   )
 end
 
-template "#{install_dir}/bin/killstorm" do
+template "#{node['storm']['install_dir']}/bin/killstorm" do
   source  "killstorm.erb"
   owner "root"
   group "root"

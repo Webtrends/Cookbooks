@@ -7,7 +7,7 @@
 #
 
 default['storm']['version'] = "0.8.2"
-default['storm']['install_dir'] = "/opt/storm"
+default['storm']['root_dir'] = "/opt/storm"
 default['storm']['log_dir'] = "/var/log/storm"
 default['storm']['cluster_role'] = ""
 
@@ -20,9 +20,9 @@ default['storm']['cluster_mode'] = "distributed"
 # zookeeper attributes
 default['storm']['zookeeper']['port'] = 2181
 default['storm']['zookeeper']['root'] = "/storm"
-default['storm']['zookeeper']['session_timeout'] = 20000
-default['storm']['zookeeper']['retry_times'] = 5
-default['storm']['zookeeper']['retry_interval'] = 1000
+default['storm']['zookeeper']['session_timeout'] = 30000
+default['storm']['zookeeper']['retry_times'] = 60
+default['storm']['zookeeper']['retry_interval'] = 5000
 
 # supervisor attributes
 default['storm']['supervisor']['workers'] = 4

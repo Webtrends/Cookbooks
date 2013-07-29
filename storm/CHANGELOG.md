@@ -1,3 +1,39 @@
+## 1.2.6
+* Cleaned up food critic warnings
+* Made default version 0.8.2
+
+## 1.2.5
+* Fixing path in supervisor runit script
+
+## 1.2.4
+* Added conf creation to the list of dirs to creat
+
+## 1.2.3
+* Changed default ZooKeeper Settings
+
+## 1.2.2
+* Removed deploy_build block entirely 
+* Changed remote_file to use :create_if_missing
+
+## 1.2.1
+* Updated run_list to recipe for determing nimbus node
+
+## 1.2.0
+* Changes to set node data for topologies to use
+
+## 1.1.0
+* Added runit include
+
+## 1.0.34
+* Used joshes correct changes
+
+## 1.0.33
+* Changed template to be current
+* Changed the service reload to not be immediate
+
+## 1.0.31
+* Added support for new runit version.
+
 ## 1.0.30
 * Changed supervisor control script which would prevent a supervisor from
   starting because worker processes were already running. It can happen
